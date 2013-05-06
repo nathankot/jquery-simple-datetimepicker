@@ -66,10 +66,8 @@
     var re = /^(\d{2,4})[-\/](\d{1,2})[-\/](\d{1,2})\s*(\d{1,2}):(\d{1,2})(?:\:\d{1,2})?$/;
     var m = re.exec(str);
 
-    console.log(str)
-    console.log(re)
     // change year for 4 digits
-    if (m[1] < 99) {
+    if (m[1] <= 99) {
       var date = new Date();
       m[1] = parseInt(m[1], 10) + parseInt(date.getFullYear().toString().substr(0, 2) + "00", 10);
     }
