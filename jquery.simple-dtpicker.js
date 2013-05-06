@@ -63,7 +63,7 @@
   };
 
   var getDate = function (str) {
-    var re = /^(\d{2,4})[-\/](\d{1,2})[-\/](\d{1,2})\s*(\d{1,2}):(\d{1,2})(?:\:\d{1,2})?$/;
+    var re = /^(\d{2,4})[-\/](\d{1,2})[-\/](\d{1,2})(?:\s*(\d{1,2}):(\d{1,2})(?:\:\d{1,2})?)$/;
     var m = re.exec(str);
 
     // change year for 4 digits
@@ -72,7 +72,9 @@
       m[1] = parseInt(m[1], 10) + parseInt(date.getFullYear().toString().substr(0, 2) + "00", 10);
     }
     // return
-    return new Date(m[1], m[2] - 1, m[3], m[4], m[5]);
+    m.shift() // Removes the full match
+    if (m.length === 3) { return new Date(m[0], m[1], m[2]) }
+    if (m.length === 5) { return new Date(m[0], m[1], m[2], m[3], m[4]) }
   }
 
   var outputToInputObject = function($picker) {
@@ -435,7 +437,7 @@
 
     draw_date($picker, {
       "isAnim": true,
-      "isOutputToInputObject": true
+      "isOutputToInputObject": false
     }, opt.current);
   };
 
