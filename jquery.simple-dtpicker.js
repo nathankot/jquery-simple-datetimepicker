@@ -63,7 +63,7 @@
   };
 
   var getDate = function (str) {
-    var re = /^(\d{2,4})[-\/](\d{1,2})[-\/](\d{1,2})(?:\s*(\d{1,2}):(\d{1,2})(?:\:\d{1,2})?)$/;
+    var re = /^(\d{2,4})[-\/](\d{1,2})[-\/](\d{1,2})(?:\s*(\d{1,2}):(\d{1,2})(?:\:\d{1,2})?)?$/;
     var m = re.exec(str);
 
     // change year for 4 digits
@@ -73,8 +73,8 @@
     }
     // return
     m.shift() // Removes the full match
-    if (m.length === 3) { return new Date(m[0], m[1], m[2]) }
-    if (m.length === 5) { return new Date(m[0], m[1], m[2], m[3], m[4]) }
+    if (m[4] === undefined || m[3] === undefined) { return new Date(m[0], m[1], m[2]) }
+    else { return new Date(m[0], m[1], m[2], m[3], m[4]) }
   }
 
   var outputToInputObject = function($picker) {
@@ -93,6 +93,10 @@
       }else{
         dateFormat = "YYYY-MM-DD hh:mm";
       }
+    }
+
+    if ($picker.data('date_only')) {
+      dateFormat = "YYYY-MM-DD";
     }
 
     str = dateFormat;
@@ -402,6 +406,7 @@
     $picker.data("dateFormat", opt.dateFormat);
     $picker.data("locale", opt.locale);
     $picker.data("animation", opt.animation);
+    $picker.data("date_only", opt.date_only);
 
     /* Header */
     var $header = $('<div>');
@@ -422,6 +427,9 @@
     var $timelist = $('<div>');
     $timelist.addClass('datepicker_timelist');
     $inner.append($timelist);
+    if (opt.date_only) {
+      $timelist.hide();
+    }
 
     /* Set event handler to picker */
     $picker.hover(
@@ -444,14 +452,14 @@
   /**
    * Initialize dtpicker
    */
-   $.fn.dtpicker = function(config) {
+  $.fn.dtpicker = function(config) {
     var date = new Date();
     var defaults = {
       "inputObjectId":  undefined,
       "current":    date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes(),
       "dateFormat":   "default",
       "locale":       "en",
-      "animation":           true
+      "animation":     true
     };
 
     var options = $.extend(defaults, config);
@@ -459,7 +467,7 @@
     return this.each(function(i) {
       init($(this), options);
     });
-   };
+  };
 
   /**
    * Initialize dtpicker, append to Text input field
@@ -482,6 +490,12 @@
       InputObjects.push(input);
 
       options.inputObjectId = inputObjectId;
+
+      if ($(input).attr('type') === 'date') {
+        options.date_only = true
+      } else {
+        options.date_only = false
+      }
 
       /* Current date */
       var date, strDate, strTime;
